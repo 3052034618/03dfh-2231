@@ -76,6 +76,73 @@
   line-height: 1.5;
 }
 
+.historyCard {
+  margin: 0 $page-padding $spacing-lg;
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.historyHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+  padding-bottom: $spacing-sm;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.historyTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.historyCount {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  background-color: $color-bg-page;
+  padding: 4rpx 16rpx;
+  border-radius: $radius-sm;
+}
+
+.historyList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.historyItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.historyLabel {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  flex-shrink: 0;
+}
+
+.historyValue {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+  text-align: right;
+  flex: 1;
+  margin-left: $spacing-md;
+  @include text-ellipsis;
+
+  &.textDanger {
+    color: $color-error;
+  }
+
+  &.textWarning {
+    color: $color-warning;
+  }
+}
+
 .formSection {
   margin: 0 $page-padding $spacing-lg;
 }

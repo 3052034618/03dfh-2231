@@ -1,16 +1,26 @@
-import React, { useMemo } from 'react';
-import { View, Text, Button } from '@tarojs/components';
+import React, { useMemo, useState } from 'react';
+import { View, Text, Button, Image } from '@tarojs/components';
 import Taro, { useRouter, useDidShow } from '@tarojs/taro';
 import { useApp } from '@/store/AppContext';
 import Timeline from '@/components/Timeline';
 import Tag from '@/components/Tag';
-import { boxStatusMap, formatDate, handleResultMap } from '@/utils';
+import type { HandleProgress } from '@/types';
+import { boxStatusMap, formatDate, handleResultMap, handleProgressMap, handleProgressColorMap, formatSimpleDate } from '@/utils';
+import classnames from 'classnames';
 import styles from './index.module.scss';
+
+const progressStepOptions: { key: HandleProgress; label: string; icon: string }[] = [
+  { key: 'contacted_driver', label: '已联系司机', icon: '📞' },
+  { key: 'waiting_owner', label: '等待货主确认', icon: '⏳' },
+  { key: 'processing', label: '处理中', icon: '🔧' },
+  { key: 'completed', label: '已完成处理', icon: '✅' }
+];
 
 const RecordDetailPage: React.FC = () => {
   const router = useRouter();
-  const { records, exceptions, currentRole, handleException } = useApp();
+  const { records, exceptions, currentRole, handleException, updateExceptionProgress } = useApp();
   const recordId = router.params.id || '';
+  const [showProgressActions, setShowProgressActions] = useState(false);
 
   const record = useMemo(() => records.find(r => r.id === recordId), [records, recordId]);
 
@@ -53,6 +63,18 @@ const RecordDetailPage: React.FC = () => {
     Taro.navigateBack();
   };
 
+  const handlePreviewPhoto = (photo: string, allPhotos: string[]) => {
+    const realPhotos = allPhotos.filter(p => p.startsWith('http') || p.startsWith('file://') || p.startsWith('tmp:'));
+    if (realPhotos.length > 0) {
+      Taro.previewImage({
+        current: photo,
+        urls: realPhotos
+      });
+    } else {
+      Taro.showToast({ title: '演示照片，暂不支持预览', icon: 'none' });
+    }
+  };
+
   const handleDispatcherAction = (action: 'change_box' | 'pause_turnover' | 'resume') => {
     const exception = relatedExceptions.find(e => !e.handled);
     if (!exception) {
@@ -85,7 +107,29 @@ const RecordDetailPage: React.FC = () => {
     });
   };
 
+  const handleUpdateProgress = (progress: HandleProgress) => {
+    const exception = relatedExceptions.find(e => !e.handled);
+    if (!exception) return;
+
+    const label = handleProgressMap[progress];
+    Taro.showModal({
+      title: `更新进度：${label}`,
+      editable: true,
+      placeholderText: '请输入备注说明（选填）',
+      confirmText: '确认更新',
+      cancelText: '取消',
+      success: (res) => {
+        if (res.confirm || res.cancel) {
+          updateExceptionProgress(exception.id, progress, res.content);
+          Taro.showToast({ title: '进度已更新', icon: 'success' });
+          setShowProgressActions(false);
+        }
+      }
+    });
+  };
+
   const unhandledException = relatedExceptions.find(e => !e.handled);
+  const latestException = relatedExceptions[0];
   const latestHandledException = [...relatedExceptions].reverse().find(e => e.handled && e.handleResult);
 
   return (
@@ -114,13 +158,70 @@ const RecordDetailPage: React.FC = () => {
         </View>
       </View>
 
-      {record.hasException && record.exceptionDesc && (
-        <View className={styles.exceptionBanner}>
-          <Text className={styles.exceptionIcon}>⚠️</Text>
-          <View className={styles.exceptionContent}>
-            <Text className={styles.exceptionTitle}>异常信息</Text>
-            <Text className={styles.exceptionDesc}>{record.exceptionDesc}</Text>
+      {unhandledException && (
+        <View className={styles.progressBanner}>
+          <View className={styles.progressHeader}>
+            <Text className={styles.progressTitle}>
+              📋 当前处理进度
+            </Text>
+            {currentRole === 'dispatcher' && (
+              <Text
+                className={styles.progressUpdateBtn}
+                onClick={() => setShowProgressActions(!showProgressActions)}
+              >
+                {showProgressActions ? '收起' : '更新进度'}
+              </Text>
+            )}
           </View>
+          <View
+            className={styles.progressCurrent}
+            style={{ borderLeftColor: handleProgressColorMap[unhandledException.currentProgress] }}
+          >
+            <Text className={styles.progressCurrentText}>
+              {unhandledException.currentProgressText}
+            </Text>
+            <Text className={styles.progressCurrentTime}>
+              {unhandledException.progressLogs[unhandledException.progressLogs.length - 1]?.time || ''}
+            </Text>
+          </View>
+
+          {showProgressActions && currentRole === 'dispatcher' && (
+            <View className={styles.progressActions}>
+              {progressStepOptions.map(opt => {
+                const isPassed = unhandledException.progressLogs.some(l => l.status === opt.key);
+                return (
+                  <View
+                    key={opt.key}
+                    className={classnames(styles.progressActionItem, isPassed && styles.passed)}
+                    onClick={() => !isPassed && handleUpdateProgress(opt.key)}
+                  >
+                    <Text className={styles.progressActionIcon}>{opt.icon}</Text>
+                    <Text className={styles.progressActionText}>{opt.label}</Text>
+                    {isPassed && <Text className={styles.progressActionCheck}>✓</Text>}
+                  </View>
+                );
+              })}
+            </View>
+          )}
+
+          {unhandledException.progressLogs.length > 0 && (
+            <View className={styles.progressTimeline}>
+              {unhandledException.progressLogs.map((log, idx) => (
+                <View key={log.id} className={styles.progressLogItem}>
+                  <View className={styles.progressDot} style={{ backgroundColor: handleProgressColorMap[log.status] }} />
+                  <View className={styles.progressLogContent}>
+                    <Text className={styles.progressLogStatus}>{log.statusText}</Text>
+                    <Text className={styles.progressLogMeta}>
+                      {log.operator} · {formatSimpleDate(log.time)}
+                    </Text>
+                    {log.remark && (
+                      <Text className={styles.progressLogRemark}>{log.remark}</Text>
+                    )}
+                  </View>
+                </View>
+              ))}
+            </View>
+          )}
         </View>
       )}
 
@@ -186,10 +287,45 @@ const RecordDetailPage: React.FC = () => {
             {relatedExceptions.map(exc => (
               <View key={exc.id} className={styles.exceptionItem}>
                 <View className={styles.exceptionItemHeader}>
-                  <Text className={styles.exceptionType}>{exc.typeText}</Text>
-                  <Tag text={exc.handled ? '已处理' : '待处理'} color={exc.handled ? 'success' : 'warning'} size="sm" />
+                  <View style={{ display: 'flex', alignItems: 'center', gap: '16rpx' }}>
+                    <Text className={styles.exceptionType}>{exc.typeText}</Text>
+                    <Tag
+                      text={exc.handled ? '已处理' : exc.currentProgressText}
+                      color={exc.handled ? 'success' : 'warning'}
+                      size="sm"
+                    />
+                  </View>
+                  <Text className={styles.exceptionSourceTag}>异常照片</Text>
                 </View>
                 <Text className={styles.exceptionDescText}>{exc.description}</Text>
+
+                {exc.photos && exc.photos.length > 0 && (
+                  <View className={styles.exceptionPhotos}>
+                    {exc.photos.map((photo, pIdx) => {
+                      const isRealPhoto = photo.startsWith('http') || photo.startsWith('file://') || photo.startsWith('tmp:');
+                      return (
+                        <View key={pIdx} className={styles.exceptionPhotoItem}>
+                          {isRealPhoto ? (
+                            <Image
+                              className={styles.exceptionPhotoImg}
+                              src={photo}
+                              mode="aspectFill"
+                              onClick={() => handlePreviewPhoto(photo, exc.photos!)}
+                            />
+                          ) : (
+                            <View
+                              className={styles.exceptionPhotoDemo}
+                              onClick={() => handlePreviewPhoto(photo, exc.photos!)}
+                            >
+                              <Text style={{ fontSize: '40rpx' }}>📷</Text>
+                            </View>
+                          )}
+                        </View>
+                      );
+                    })}
+                  </View>
+                )}
+
                 <Text className={styles.exceptionMeta}>
                   {exc.reporter} · {exc.createdAt}
                 </Text>
@@ -206,10 +342,13 @@ const RecordDetailPage: React.FC = () => {
       )}
 
       <View className={styles.infoSection}>
-        <Text className={styles.sectionTitle}>
-          <Text className={styles.sectionIcon}>⏱️</Text>
-          流转记录
-        </Text>
+        <View className={styles.sectionHeader}>
+          <Text className={styles.sectionTitle}>
+            <Text className={styles.sectionIcon}>⏱️</Text>
+            流转记录
+          </Text>
+          <Text className={styles.sectionTag}>节点打卡照片</Text>
+        </View>
         <View className={styles.timelineCard}>
           <Timeline nodes={record.nodes} />
         </View>

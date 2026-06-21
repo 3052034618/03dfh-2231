@@ -1,5 +1,5 @@
 import Taro from '@tarojs/taro';
-import type { NodeType, NodeStatus, BoxStatus, ExceptionType, HandleResult } from '@/types';
+import type { NodeType, NodeStatus, BoxStatus, ExceptionType, HandleResult, HandleProgress } from '@/types';
 
 export const nodeTypeMap: Record<NodeType, string> = {
   warehouse: '仓库',
@@ -40,6 +40,22 @@ export const handleResultMap: Record<NonNullable<HandleResult>, string> = {
   change_box: '换箱',
   pause_turnover: '暂停周转',
   resume: '恢复周转'
+};
+
+export const handleProgressMap: Record<HandleProgress, string> = {
+  reported: '已上报',
+  contacted_driver: '已联系司机',
+  waiting_owner: '等待货主确认',
+  processing: '处理中',
+  completed: '已完成处理'
+};
+
+export const handleProgressColorMap: Record<HandleProgress, string> = {
+  reported: '#F53F3F',
+  contacted_driver: '#FF7D00',
+  waiting_owner: '#FF7D00',
+  processing: '#1E88E5',
+  completed: '#00B42A'
 };
 
 export const nodeStatusSortPriority: Record<NodeStatus, number> = {

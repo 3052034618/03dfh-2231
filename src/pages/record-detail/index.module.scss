@@ -305,3 +305,204 @@
   margin-top: $spacing-xs;
   display: block;
 }
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-sm;
+}
+
+.sectionTag {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  background-color: $color-bg-page;
+  padding: 4rpx 16rpx;
+  border-radius: $radius-sm;
+}
+
+.exceptionSourceTag {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  background-color: rgba(30, 136, 229, 0.1);
+  padding: 4rpx 16rpx;
+  border-radius: $radius-sm;
+  flex-shrink: 0;
+}
+
+.exceptionPhotos {
+  display: flex;
+  gap: $spacing-sm;
+  flex-wrap: wrap;
+  margin: $spacing-sm 0;
+}
+
+.exceptionPhotoItem {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: $radius-sm;
+  overflow: hidden;
+  background-color: $color-bg-page;
+}
+
+.exceptionPhotoImg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.exceptionPhotoDemo {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progressBanner {
+  margin: 0 $page-padding $spacing-md;
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.progressHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.progressTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.progressUpdateBtn {
+  font-size: $font-size-sm;
+  color: $color-primary;
+}
+
+.progressCurrent {
+  background-color: rgba(255, 125, 0, 0.05);
+  border-left: 6rpx solid #FF7D00;
+  padding: $spacing-md $spacing-lg;
+  border-radius: 0 $radius-md $radius-md 0;
+  margin-bottom: $spacing-md;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.progressCurrentText {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.progressCurrentTime {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.progressActions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-sm;
+  margin-bottom: $spacing-md;
+}
+
+.progressActionItem {
+  background-color: $color-bg-page;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-xs;
+  border: 2rpx solid $color-border;
+  transition: all $transition-base;
+  position: relative;
+
+  &.passed {
+    background-color: rgba(0, 180, 42, 0.05);
+    border-color: rgba(0, 180, 42, 0.3);
+  }
+
+  &:active:not(.passed) {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.progressActionIcon {
+  font-size: 40rpx;
+}
+
+.progressActionText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.progressActionCheck {
+  position: absolute;
+  top: 8rpx;
+  right: 12rpx;
+  color: #00B42A;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+}
+
+.progressTimeline {
+  border-top: 1rpx solid $color-divider;
+  padding-top: $spacing-md;
+}
+
+.progressLogItem {
+  display: flex;
+  gap: $spacing-md;
+  padding-bottom: $spacing-md;
+  position: relative;
+
+  &:last-child {
+    padding-bottom: 0;
+  }
+}
+
+.progressDot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  margin-top: 8rpx;
+  flex-shrink: 0;
+}
+
+.progressLogContent {
+  flex: 1;
+}
+
+.progressLogStatus {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  display: block;
+}
+
+.progressLogMeta {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: 4rpx;
+  display: block;
+}
+
+.progressLogRemark {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  background-color: $color-bg-page;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $radius-sm;
+  margin-top: $spacing-xs;
+  display: inline-block;
+}

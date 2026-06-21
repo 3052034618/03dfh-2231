@@ -5,12 +5,12 @@ import { useApp } from '@/store/AppContext';
 import { mockRoutes, mockOwners } from '@/data/mockRoutes';
 import Tag from '@/components/Tag';
 import classnames from 'classnames';
-import { generateId } from '@/utils';
+import { generateId, formatSimpleDate } from '@/utils';
 import styles from './index.module.scss';
 
 const CreateOrderPage: React.FC = () => {
   const router = useRouter();
-  const { boxes, addRecord, userName, currentRole } = useApp();
+  const { boxes, addRecord, userName, currentRole, getBoxHistory } = useApp();
   const boxCode = router.params.boxCode || 'BOX-2024-0001';
 
   const [selectedRouteId, setSelectedRouteId] = useState('');
@@ -21,6 +21,8 @@ const CreateOrderPage: React.FC = () => {
   const boxInfo = useMemo(() => boxes.find(b => b.code === boxCode) || {
     id: 'mock', code: boxCode, status: 'normal' as const, type: 'GSP医药冷链箱（60L）'
   }, [boxes, boxCode]);
+
+  const boxHistory = useMemo(() => getBoxHistory(boxCode), [getBoxHistory, boxCode]);
 
   useDidShow(() => {
     console.log('[CreateOrder] 页面显示，箱体编号：', boxCode);
@@ -116,6 +118,46 @@ const CreateOrderPage: React.FC = () => {
           </View>
         </View>
       )}
+
+      <View className={styles.historyCard}>
+        <View className={styles.historyHeader}>
+          <Text className={styles.historyTitle}>
+            <Text style={{ marginRight: '8rpx' }}>📋</Text>
+            箱体历史追溯
+          </Text>
+          <Text className={styles.historyCount}>
+            累计 {boxHistory.totalTurnoverCount} 次周转
+          </Text>
+        </View>
+        <View className={styles.historyList}>
+          <View className={styles.historyItem}>
+            <Text className={styles.historyLabel}>最近回收时间</Text>
+            <Text className={styles.historyValue}>
+              {boxHistory.lastReturnTime ? formatSimpleDate(boxHistory.lastReturnTime) : '—'}
+            </Text>
+          </View>
+          <View className={styles.historyItem}>
+            <Text className={styles.historyLabel}>上次周转线路</Text>
+            <Text className={styles.historyValue}>
+              {boxHistory.lastTurnover?.routeName || '—'}
+            </Text>
+          </View>
+          <View className={styles.historyItem}>
+            <Text className={styles.historyLabel}>上次异常</Text>
+            <Text className={classnames(styles.historyValue, boxHistory.lastException && styles.textDanger)}>
+              {boxHistory.lastException
+                ? `${boxHistory.lastException.typeText} · ${formatSimpleDate(boxHistory.lastException.createdAt)}`
+                : '无异常记录'}
+            </Text>
+          </View>
+          <View className={styles.historyItem}>
+            <Text className={styles.historyLabel}>当前状态</Text>
+            <Text className={classnames(styles.historyValue, boxHistory.hasActiveRecord && styles.textWarning)}>
+              {boxHistory.hasActiveRecord ? '在途周转中' : '已回库，可使用'}
+            </Text>
+          </View>
+        </View>
+      </View>
 
       <View className={styles.formSection}>
         <Text className={styles.sectionTitle}>

@@ -12,6 +12,17 @@ export type HandleAction = 'change_box' | 'pause_turnover' | 'none';
 
 export type HandleResult = 'change_box' | 'pause_turnover' | 'resume' | null;
 
+export type HandleProgress = 'reported' | 'contacted_driver' | 'waiting_owner' | 'processing' | 'completed';
+
+export interface HandleProgressLog {
+  id: string;
+  status: HandleProgress;
+  statusText: string;
+  operator: string;
+  time: string;
+  remark?: string;
+}
+
 export interface BoxInfo {
   id: string;
   code: string;
@@ -83,4 +94,15 @@ export interface ExceptionRecord {
   handledBy?: string;
   handleResult?: HandleResult;
   handleDesc?: string;
+  currentProgress: HandleProgress;
+  currentProgressText: string;
+  progressLogs: HandleProgressLog[];
+}
+
+export interface BoxHistoryInfo {
+  lastTurnover?: TurnoverRecord;
+  lastException?: ExceptionRecord;
+  lastReturnTime?: string;
+  totalTurnoverCount: number;
+  hasActiveRecord: boolean;
 }

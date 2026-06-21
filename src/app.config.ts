@@ -8,6 +8,7 @@ export default defineAppConfig({
     'pages/checkin/index',
     'pages/exception/index',
     'pages/exception-list/index',
+    'pages/data-export/index',
     'pages/record-detail/index'
   ],
   window: {

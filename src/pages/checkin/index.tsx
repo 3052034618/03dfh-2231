@@ -5,7 +5,7 @@ import { useApp } from '@/store/AppContext';
 import Tag from '@/components/Tag';
 import classnames from 'classnames';
 import type { NodeType, NodeStatus } from '@/types';
-import { nodeTypeMap, nodeStatusMap, generateId, boxStatusMap } from '@/utils';
+import { nodeTypeMap, nodeStatusMap, generateId, boxStatusMap, formatSimpleDate } from '@/utils';
 import styles from './index.module.scss';
 
 const nodeTypeOptions: { key: NodeType; label: string; icon: string }[] = [
@@ -24,7 +24,7 @@ const statusOptions: { key: NodeStatus; label: string }[] = [
 
 const CheckinPage: React.FC = () => {
   const router = useRouter();
-  const { records, addNodeToRecord, userName, currentRole, updateRecord } = useApp();
+  const { records, addNodeToRecord, userName, currentRole, updateRecord, getBoxHistory } = useApp();
   const boxCode = router.params.boxCode || 'BOX-2024-0001';
 
   const [selectedNodeType, setSelectedNodeType] = useState<NodeType>('');
@@ -34,7 +34,9 @@ const CheckinPage: React.FC = () => {
   const [remark, setRemark] = useState('');
   const [photos, setPhotos] = useState<string[]>([]);
 
-  const currentRecord = useMemo(() => records.find(r => r.boxCode === boxCode), [records, boxCode]);
+  const currentRecord = useMemo(() => records.find(r => r.boxCode === boxCode && !r.nodes.some(n => n.status === 'return')), [records, boxCode]);
+
+  const boxHistory = useMemo(() => getBoxHistory(boxCode), [getBoxHistory, boxCode]);
 
   useDidShow(() => {
     console.log('[Checkin] 页面显示，箱体：', boxCode, '是否有记录：', !!currentRecord);
@@ -160,6 +162,42 @@ const CheckinPage: React.FC = () => {
               color={currentRecord.status === 'normal' ? 'success' : currentRecord.status === 'abnormal' ? 'error' : 'warning'}
             />
           )}
+        </View>
+      </View>
+
+      <View className={styles.historyCard}>
+        <View className={styles.historyHeader}>
+          <Text className={styles.historyTitle}>
+            <Text style={{ marginRight: '8rpx' }}>📋</Text>
+            箱体历史追溯
+          </Text>
+          <Text className={styles.historyCount}>
+            累计 {boxHistory.totalTurnoverCount} 次周转
+          </Text>
+        </View>
+        <View className={styles.historyList}>
+          <View className={styles.historyItem}>
+            <Text className={styles.historyLabel}>当前运输</Text>
+            <Text className={classnames(styles.historyValue, styles.textPrimary)}>
+              {boxHistory.hasActiveRecord && boxHistory.lastTurnover?.routeName
+                ? boxHistory.lastTurnover.routeName
+                : '无在途记录'}
+            </Text>
+          </View>
+          <View className={styles.historyItem}>
+            <Text className={styles.historyLabel}>最近回收时间</Text>
+            <Text className={styles.historyValue}>
+              {boxHistory.lastReturnTime ? formatSimpleDate(boxHistory.lastReturnTime) : '—'}
+            </Text>
+          </View>
+          <View className={styles.historyItem}>
+            <Text className={styles.historyLabel}>上次异常</Text>
+            <Text className={classnames(styles.historyValue, boxHistory.lastException && styles.textDanger)}>
+              {boxHistory.lastException
+                ? `${boxHistory.lastException.typeText} · ${formatSimpleDate(boxHistory.lastException.createdAt)}`
+                : '无异常记录'}
+            </Text>
+          </View>
         </View>
       </View>
 

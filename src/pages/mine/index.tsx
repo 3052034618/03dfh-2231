@@ -17,9 +17,10 @@ const driverMenuItems = [
 
 const dispatcherMenuItems = [
   { icon: '⚠️', title: '异常待处理', desc: '司机上报的箱体异常', color: 'iconRed', action: 'exception-list' as const },
-  { icon: '📊', title: '数据统计', desc: '周转数据和报表', color: 'iconBlue' },
-  { icon: '👥', title: '人员管理', desc: '司机和交接员管理', color: 'iconGreen' },
-  { icon: '📦', title: '箱体管理', desc: '低温箱信息管理', color: 'iconOrange' },
+  { icon: '�', title: '数据导出', desc: '按日期导出周转/异常数据', color: 'iconBlue', action: 'data-export' as const },
+  { icon: '�', title: '数据统计', desc: '周转数据和报表', color: 'iconGreen' },
+  { icon: '👥', title: '人员管理', desc: '司机和交接员管理', color: 'iconOrange' },
+  { icon: '📦', title: '箱体管理', desc: '低温箱信息管理', color: 'iconGray' },
   { icon: '❓', title: '帮助中心', desc: '使用指南和常见问题', color: 'iconGray' },
   { icon: '⚙️', title: '系统设置', desc: '应用设置和偏好', color: 'iconGray' }
 ];
@@ -72,9 +73,15 @@ const MinePage: React.FC = () => {
   };
 
   const handleMenuClick = (item: typeof currentMenu[number]) => {
-    if ('action' in item && item.action === 'exception-list') {
-      Taro.navigateTo({ url: '/pages/exception-list/index' });
-      return;
+    if ('action' in item) {
+      if (item.action === 'exception-list') {
+        Taro.navigateTo({ url: '/pages/exception-list/index' });
+        return;
+      }
+      if (item.action === 'data-export') {
+        Taro.navigateTo({ url: '/pages/data-export/index' });
+        return;
+      }
     }
     Taro.showToast({ title: `${item.title}功能开发中`, icon: 'none' });
   };
