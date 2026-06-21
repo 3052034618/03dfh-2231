@@ -1,28 +1,71 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { View, Text, Button } from '@tarojs/components';
 import Taro, { useRouter, useDidShow } from '@tarojs/taro';
 import { useApp } from '@/store/AppContext';
 import Tag from '@/components/Tag';
 import classnames from 'classnames';
+import { storage, STORAGE_KEYS, nowString } from '@/utils';
 import styles from './index.module.scss';
 
 type ScanMode = 'create' | 'checkin';
 
-const recentDemoScans = [
-  { code: 'BOX-2024-0001', time: '10分钟前', status: 'normal' as const },
-  { code: 'BOX-2024-0005', time: '30分钟前', status: 'normal' as const },
-  { code: 'BOX-2024-0002', time: '1小时前', status: 'abnormal' as const }
-];
+interface ScanHistoryItem {
+  code: string;
+  time: string;
+  status: 'normal' | 'abnormal' | 'overdue' | 'unreturned';
+}
 
 const ScanPage: React.FC = () => {
   const router = useRouter();
-  const { boxes } = useApp();
-  const [mode, setMode] = useState<ScanMode>(router.params.mode === 'checkin' ? 'checkin' : 'create');
+  const { boxes, checkBoxRisk, getRecordByBoxCode } = useApp();
+  const [mode, setMode] = useState<ScanMode>('create');
+  const [scanHistory, setScanHistory] = useState<ScanHistoryItem[]>([]);
+
+  useEffect(() => {
+    const saved = storage.get<ScanHistoryItem[]>(STORAGE_KEYS.LAST_SCAN);
+    if (saved && saved.length > 0) {
+      setScanHistory(saved);
+    }
+  }, []);
+
+  useEffect(() => {
+    const paramMode = router.params.mode;
+    console.log('[Scan] 路由参数 mode:', paramMode);
+    if (paramMode === 'checkin') {
+      setMode('checkin');
+    } else if (paramMode === 'create') {
+      setMode('create');
+    } else {
+      const savedParams = storage.get<string>('scan_page_params');
+      console.log('[Scan] storage 参数:', savedParams);
+      if (savedParams) {
+        const params = new URLSearchParams(savedParams);
+        const storedMode = params.get('mode');
+        if (storedMode === 'checkin' || storedMode === 'create') {
+          setMode(storedMode);
+        }
+        storage.remove('scan_page_params');
+      }
+    }
+  }, [router.params.mode]);
 
   useDidShow(() => {
-    console.log('[Scan] 页面显示，模式：', mode);
-    if (router.params.mode === 'checkin') {
+    const paramMode = router.params.mode;
+    console.log('[Scan] useDidShow, mode param:', paramMode);
+    if (paramMode === 'checkin') {
       setMode('checkin');
+    } else if (paramMode === 'create') {
+      setMode('create');
+    } else {
+      const savedParams = storage.get<string>('scan_page_params');
+      if (savedParams) {
+        const params = new URLSearchParams(savedParams);
+        const storedMode = params.get('mode');
+        if (storedMode === 'checkin' || storedMode === 'create') {
+          setMode(storedMode);
+        }
+        storage.remove('scan_page_params');
+      }
     }
   });
 
@@ -31,59 +74,121 @@ const ScanPage: React.FC = () => {
     : { title: '节点打卡', desc: '扫描箱体二维码，进行节点打卡和状态更新' }
   , [mode]);
 
+  const saveScanHistory = (boxCode: string, status: ScanHistoryItem['status']) => {
+    const item: ScanHistoryItem = {
+      code: boxCode,
+      time: nowString(),
+      status
+    };
+    const newHistory = [item, ...scanHistory.filter(h => h.code !== boxCode)].slice(0, 10);
+    setScanHistory(newHistory);
+    storage.set(STORAGE_KEYS.LAST_SCAN, newHistory);
+  };
+
+  const validateAndProceed = (boxCode: string) => {
+    if (!boxCode || boxCode.trim().length === 0) {
+      Taro.showToast({ title: '扫码内容为空，请重试', icon: 'none' });
+      return;
+    }
+
+    const code = boxCode.trim();
+
+    if (mode === 'checkin') {
+      const existingRecord = getRecordByBoxCode(code);
+      if (!existingRecord) {
+        Taro.showModal({
+          title: '未找到周转记录',
+          content: `箱体 ${code} 暂无在途周转记录，请先扫码建单`,
+          showCancel: false,
+          confirmText: '知道了'
+        });
+        return;
+      }
+    }
+
+    const risk = checkBoxRisk(code);
+    console.log('[Scan] 扫码结果:', code, '风险检查:', risk);
+
+    if (risk.hasRisk) {
+      const statusColor: ScanHistoryItem['status'] = risk.riskType || 'abnormal';
+      saveScanHistory(code, statusColor);
+
+      Taro.showModal({
+        title: '⚠️ 箱体状态提醒',
+        content: risk.message || '该箱体存在风险，请确认是否继续操作',
+        confirmText: '继续操作',
+        cancelText: '取消',
+        success: (res) => {
+          if (res.confirm) {
+            proceedNext(code);
+          }
+        }
+      });
+    } else {
+      saveScanHistory(code, 'normal');
+      Taro.showToast({ title: `扫描成功：${code}`, icon: 'success' });
+      setTimeout(() => proceedNext(code), 500);
+    }
+  };
+
   const handleScan = async () => {
     try {
-      console.log('[Scan] 开始扫码...');
-      Taro.showLoading({ title: '扫码中...' });
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      Taro.hideLoading();
+      console.log('[Scan] 调起系统扫码...');
 
-      const mockCode = 'BOX-2024-0001';
-      const foundBox = boxes.find(b => b.code === mockCode);
+      const res = await Taro.scanCode({
+        onlyFromCamera: false,
+        scanType: ['qrCode', 'barCode']
+      });
 
-      if (foundBox && (foundBox.status === 'abnormal' || foundBox.status === 'overdue' || foundBox.status === 'unreturned')) {
-        Taro.showModal({
-          title: '箱体状态提醒',
-          content: `该箱体${foundBox.status === 'abnormal' ? '存在异常记录' : foundBox.status === 'overdue' ? '已超期' : '未归还'}${foundBox.lastExceptionDesc ? `：${foundBox.lastExceptionDesc}` : ''}，是否继续？`,
-          confirmText: '继续操作',
-          cancelText: '取消',
-          success: (res) => {
-            if (res.confirm) {
-              proceedNext(mockCode);
-            }
-          }
-        });
+      console.log('[Scan] 扫码结果:', res);
+
+      if (res && res.result) {
+        validateAndProceed(res.result);
       } else {
-        Taro.showToast({ title: `扫描成功：${mockCode}`, icon: 'success' });
-        setTimeout(() => proceedNext(mockCode), 500);
+        Taro.showToast({ title: '扫码失败，请重试', icon: 'none' });
       }
     } catch (err) {
-      console.error('[Scan] 扫码失败：', err);
-      Taro.hideLoading();
-      Taro.showToast({ title: '扫码失败，请重试', icon: 'none' });
+      console.error('[Scan] 扫码异常:', err);
+
+      const fallbackList = boxes.slice(0, 8).map(b => b.code);
+      Taro.showActionSheet({
+        itemList: fallbackList,
+        success: (actionRes) => {
+          const code = fallbackList[actionRes.tapIndex];
+          validateAndProceed(code);
+        },
+        fail: () => {
+          Taro.showToast({ title: '扫码已取消', icon: 'none' });
+        }
+      });
     }
   };
 
   const proceedNext = (boxCode: string) => {
+    console.log('[Scan] 跳转到下一步，模式:', mode, '箱体:', boxCode);
     if (mode === 'create') {
       Taro.navigateTo({
-        url: `/pages/create-order/index?boxCode=${boxCode}`
+        url: `/pages/create-order/index?boxCode=${encodeURIComponent(boxCode)}`
       });
     } else {
       Taro.navigateTo({
-        url: `/pages/checkin/index?boxCode=${boxCode}`
+        url: `/pages/checkin/index?boxCode=${encodeURIComponent(boxCode)}`
       });
     }
   };
 
   const handleManualInput = () => {
+    const boxCodes = boxes.map(b => b.code);
     Taro.showActionSheet({
-      itemList: ['BOX-2024-0001', 'BOX-2024-0002', 'BOX-2024-0003', 'BOX-2024-0004', 'BOX-2024-0005'],
+      itemList: boxCodes,
       success: (res) => {
-        const codes = ['BOX-2024-0001', 'BOX-2024-0002', 'BOX-2024-0003', 'BOX-2024-0004', 'BOX-2024-0005'];
-        proceedNext(codes[res.tapIndex]);
+        validateAndProceed(boxCodes[res.tapIndex]);
       }
     });
+  };
+
+  const handleHistoryClick = (item: ScanHistoryItem) => {
+    validateAndProceed(item.code);
   };
 
   return (
@@ -121,36 +226,45 @@ const ScanPage: React.FC = () => {
         </Button>
       </View>
 
-      <View className={styles.recentScans}>
-        <Text className={styles.sectionTitle}>最近扫描</Text>
-        <View className={styles.scanHistory}>
-          {recentDemoScans.map((item, idx) => (
-            <View
-              key={idx}
-              className={styles.historyItem}
-              onClick={() => proceedNext(item.code)}
-            >
-              <View className={styles.historyLeft}>
-                <View className={styles.historyIcon}>
-                  <Text>📦</Text>
-                </View>
-                <View className={styles.historyInfo}>
-                  <View style={{ display: 'flex', alignItems: 'center', gap: '16rpx' }}>
-                    <Text className={styles.historyCode}>{item.code}</Text>
-                    <Tag
-                      text={item.status === 'normal' ? '正常' : item.status === 'abnormal' ? '异常' : '超期'}
-                      color={item.status === 'normal' ? 'success' : 'error'}
-                      size="sm"
-                    />
+      {scanHistory.length > 0 && (
+        <View className={styles.recentScans}>
+          <Text className={styles.sectionTitle}>最近扫描</Text>
+          <View className={styles.scanHistory}>
+            {scanHistory.slice(0, 5).map((item, idx) => (
+              <View
+                key={idx}
+                className={styles.historyItem}
+                onClick={() => handleHistoryClick(item)}
+              >
+                <View className={styles.historyLeft}>
+                  <View className={styles.historyIcon}>
+                    <Text>📦</Text>
                   </View>
-                  <Text className={styles.historyTime}>{item.time}</Text>
+                  <View className={styles.historyInfo}>
+                    <View style={{ display: 'flex', alignItems: 'center', gap: '16rpx' }}>
+                      <Text className={styles.historyCode}>{item.code}</Text>
+                      <Tag
+                        text={
+                          item.status === 'normal' ? '正常' :
+                          item.status === 'abnormal' ? '异常' :
+                          item.status === 'overdue' ? '超期' : '未归还'
+                        }
+                        color={
+                          item.status === 'normal' ? 'success' :
+                          item.status === 'abnormal' ? 'error' : 'warning'
+                        }
+                        size="sm"
+                      />
+                    </View>
+                    <Text className={styles.historyTime}>{item.time}</Text>
+                  </View>
                 </View>
+                <Text className={styles.historyArrow}>›</Text>
               </View>
-              <Text className={styles.historyArrow}>›</Text>
-            </View>
-          ))}
+            ))}
+          </View>
         </View>
-      </View>
+      )}
     </View>
   );
 };

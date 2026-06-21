@@ -7,6 +7,7 @@ export default defineAppConfig({
     'pages/create-order/index',
     'pages/checkin/index',
     'pages/exception/index',
+    'pages/exception-list/index',
     'pages/record-detail/index'
   ],
   window: {

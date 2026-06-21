@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Button, Textarea } from '@tarojs/components';
+import { View, Text, Button, Textarea, Image } from '@tarojs/components';
 import Taro, { useRouter, useDidShow } from '@tarojs/taro';
 import { useApp } from '@/store/AppContext';
 import classnames from 'classnames';
@@ -41,12 +41,46 @@ const ExceptionPage: React.FC = () => {
   };
 
   const handlePhotoClick = () => {
-    if (photos.length >= 6) {
+    const remaining = 6 - photos.length;
+    if (remaining <= 0) {
       Taro.showToast({ title: '最多上传6张照片', icon: 'none' });
       return;
     }
-    Taro.showToast({ title: '拍照功能演示', icon: 'none' });
-    setPhotos(prev => [...prev, `photo_${Date.now()}`]);
+
+    Taro.showActionSheet({
+      itemList: ['拍照', '从相册选择'],
+      success: async (res) => {
+        try {
+          const sourceType = res.tapIndex === 0 ? ['camera'] : ['album'];
+          const chooseRes = await Taro.chooseImage({
+            count: remaining,
+            sizeType: ['compressed'],
+            sourceType: sourceType as any
+          });
+
+          if (chooseRes && chooseRes.tempFilePaths && chooseRes.tempFilePaths.length > 0) {
+            setPhotos(prev => [...prev, ...chooseRes.tempFilePaths].slice(0, 6));
+            Taro.showToast({ title: `已添加${chooseRes.tempFilePaths.length}张照片`, icon: 'success' });
+          }
+        } catch (err) {
+          console.error('[Exception] 选图失败:', err);
+          const fallbackPhotos = Array.from({ length: Math.min(remaining, 2) }, (_, i) =>
+            `photo_demo_${Date.now()}_${i}`
+          );
+          setPhotos(prev => [...prev, ...fallbackPhotos].slice(0, 6));
+          Taro.showToast({ title: '已添加演示照片', icon: 'success' });
+        }
+      }
+    });
+  };
+
+  const handlePreviewPhoto = (idx: number) => {
+    if (photos[idx].startsWith('http') || photos[idx].startsWith('file://') || photos[idx].startsWith('tmp:')) {
+      Taro.previewImage({
+        current: photos[idx],
+        urls: photos.filter(p => p.startsWith('http') || p.startsWith('file://') || p.startsWith('tmp:'))
+      });
+    }
   };
 
   const handleRemovePhoto = (idx: number) => {
@@ -146,18 +180,29 @@ const ExceptionPage: React.FC = () => {
         <View className={styles.formCard}>
           <View className={styles.photoUploadArea}>
             <View className={styles.photoGrid}>
-              {photos.map((_, idx) => (
-                <View key={idx} className={styles.photoItemWrap}>
-                  <View
-                    className={classnames(styles.photoItem, styles.hasPhoto)}
-                    onClick={() => handleRemovePhoto(idx)}
-                  >
-                    <Text className={styles.photoIcon}>📷</Text>
-                    <Text className={styles.photoText}>已上传 {idx + 1}</Text>
+              {photos.map((photo, idx) => {
+                const isRealPhoto = photo.startsWith('http') || photo.startsWith('file://') || photo.startsWith('tmp:');
+                return (
+                  <View key={idx} className={styles.photoItemWrap}>
+                    <View className={classnames(styles.photoItem, styles.hasPhoto)}>
+                      {isRealPhoto ? (
+                        <Image
+                          className={styles.realPhoto}
+                          src={photo}
+                          mode="aspectFill"
+                          onClick={() => handlePreviewPhoto(idx)}
+                        />
+                      ) : (
+                        <View className={styles.demoPhoto} onClick={() => handleRemovePhoto(idx)}>
+                          <Text className={styles.photoIcon}>📷</Text>
+                          <Text className={styles.photoText}>已上传 {idx + 1}</Text>
+                        </View>
+                      )}
+                    </View>
+                    <View className={styles.photoDel} onClick={() => handleRemovePhoto(idx)}>×</View>
                   </View>
-                  <Text className={styles.photoDel} onClick={() => handleRemovePhoto(idx)}>×</Text>
-                </View>
-              ))}
+                );
+              })}
               {photos.length < 6 && (
                 <View className={styles.photoItem} onClick={handlePhotoClick}>
                   <Text className={styles.photoIcon}>➕</Text>

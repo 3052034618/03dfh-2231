@@ -1,0 +1,240 @@
+@use '@/styles/variables.scss' as *;
+
+.pageContainer {
+  min-height: 100vh;
+  background-color: $color-bg-page;
+}
+
+.tabsRow {
+  display: flex;
+  background-color: $color-bg-card;
+  padding: $spacing-sm $page-padding;
+  border-bottom: 1rpx solid $color-divider;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.tabItem {
+  flex: 1;
+  text-align: center;
+  padding: $spacing-sm 0;
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+  position: relative;
+
+  &.active {
+    color: $color-primary;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 48rpx;
+      height: 6rpx;
+      border-radius: 3rpx;
+      background-color: $color-primary;
+    }
+  }
+}
+
+.listContainer {
+  padding: $spacing-md $page-padding;
+}
+
+.exceptionCard {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+
+  &.handled {
+    opacity: 0.7;
+  }
+}
+
+.cardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.cardTitle {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  flex: 1;
+}
+
+.boxCode {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+}
+
+.typeBadge {
+  padding: 4rpx 16rpx;
+  border-radius: $radius-sm;
+  background-color: rgba(245, 63, 63, 0.1);
+  color: $color-error;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+}
+
+.statusTag {
+  padding: 6rpx 20rpx;
+  border-radius: $radius-button;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+
+  &.pending {
+    background-color: rgba(255, 125, 0, 0.1);
+    color: #FF7D00;
+  }
+
+  &.handled {
+    background-color: rgba(0, 180, 42, 0.1);
+    color: #00B42A;
+  }
+}
+
+.cardInfo {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+  margin-bottom: $spacing-md;
+}
+
+.infoRow {
+  display: flex;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: 1.6;
+
+  .label {
+    flex-shrink: 0;
+    width: 120rpx;
+    color: $color-text-tertiary;
+  }
+
+  .value {
+    flex: 1;
+    color: $color-text-primary;
+  }
+}
+
+.descBox {
+  background-color: $color-bg-page;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  margin-bottom: $spacing-md;
+}
+
+.descText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: 1.6;
+}
+
+.photosRow {
+  display: flex;
+  gap: $spacing-sm;
+  flex-wrap: wrap;
+  margin-bottom: $spacing-md;
+}
+
+.photoItem {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: $radius-sm;
+  background-color: $color-bg-page;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.photoImg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.photoIcon {
+  font-size: 48rpx;
+}
+
+.handleResultBox {
+  background-color: rgba(0, 180, 42, 0.05);
+  border: 1rpx solid rgba(0, 180, 42, 0.2);
+  border-radius: $radius-md;
+  padding: $spacing-md;
+}
+
+.handleResultTitle {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: #00B42A;
+  margin-bottom: $spacing-xs;
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+}
+
+.handleResultText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: 1.6;
+}
+
+.footerBar {
+  display: flex;
+  gap: $spacing-sm;
+  margin-top: $spacing-sm;
+}
+
+.handleBtn {
+  flex: 1;
+  height: 72rpx;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &.changeBox {
+    background-color: rgba(30, 136, 229, 0.1);
+    color: $color-primary;
+  }
+
+  &.pause {
+    background-color: rgba(245, 63, 63, 0.1);
+    color: $color-error;
+  }
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.emptyBox {
+  padding: 160rpx 32rpx;
+  text-align: center;
+}
+
+.emptyIcon {
+  font-size: 100rpx;
+  display: block;
+  margin-bottom: $spacing-md;
+}
+
+.emptyText {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+}

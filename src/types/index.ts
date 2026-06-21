@@ -6,7 +6,11 @@ export type NodeStatus = 'deliver' | 'storage' | 'recycle' | 'return';
 
 export type ExceptionType = 'damaged' | 'ice_pack_missing' | 'temp_tag_changed' | 'other';
 
-export type UserRole = 'driver' | 'operator';
+export type UserRole = 'driver' | 'operator' | 'dispatcher';
+
+export type HandleAction = 'change_box' | 'pause_turnover' | 'none';
+
+export type HandleResult = 'change_box' | 'pause_turnover' | 'resume' | null;
 
 export interface BoxInfo {
   id: string;
@@ -75,5 +79,8 @@ export interface ExceptionRecord {
   reporterRole: UserRole;
   createdAt: string;
   handled: boolean;
+  handledAt?: string;
+  handledBy?: string;
+  handleResult?: HandleResult;
   handleDesc?: string;
 }

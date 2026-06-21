@@ -222,3 +222,86 @@
     transform: scale(0.98);
   }
 }
+
+.handledResultBanner {
+  margin: 0 $page-padding $spacing-md;
+  background: linear-gradient(135deg, rgba(0, 180, 42, 0.08), rgba(38, 198, 218, 0.08));
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  border: 2rpx solid rgba(0, 180, 42, 0.2);
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-md;
+}
+
+.handledIcon {
+  font-size: 40rpx;
+  flex-shrink: 0;
+}
+
+.handledContent {
+  flex: 1;
+}
+
+.handledTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: #00B42A;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.handledDesc {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: 1.6;
+  display: block;
+}
+
+.exceptionListCard {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  box-shadow: $shadow-card;
+}
+
+.exceptionItem {
+  padding: $spacing-lg;
+  border-bottom: 1rpx solid $color-divider;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.exceptionItemHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-xs;
+}
+
+.exceptionType {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.exceptionDescText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: 1.6;
+  margin-bottom: $spacing-xs;
+}
+
+.exceptionMeta {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.exceptionHandleInfo {
+  font-size: $font-size-xs;
+  color: #00B42A;
+  margin-top: $spacing-xs;
+  display: block;
+}

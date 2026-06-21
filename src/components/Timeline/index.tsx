@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, Text } from '@tarojs/components';
-import type { TimelineNode } from '@/types';
+import { View, Text, Image } from '@tarojs/components';
+import Taro from '@tarojs/taro';
+import type { TimelineNode, NodeStatus } from '@/types';
 import Tag from '../Tag';
-import { nodeTypeMap, formatSimpleDate } from '@/utils';
+import { nodeTypeMap, formatSimpleDate, nodeStatusSortPriority } from '@/utils';
 import styles from './index.module.scss';
 import classnames from 'classnames';
 
@@ -20,15 +21,46 @@ const getStatusColor = (status: string): 'primary' | 'success' | 'warning' | 'gr
   }
 };
 
+const sortNodes = (nodes: TimelineNode[]): TimelineNode[] => {
+  return [...nodes].sort((a, b) => {
+    const priorityA = nodeStatusSortPriority[a.status as NodeStatus] ?? 99;
+    const priorityB = nodeStatusSortPriority[b.status as NodeStatus] ?? 99;
+
+    if (priorityA !== priorityB) {
+      return priorityA - priorityB;
+    }
+
+    try {
+      const timeA = new Date(a.time.replace(' ', 'T')).getTime();
+      const timeB = new Date(b.time.replace(' ', 'T')).getTime();
+      if (!isNaN(timeA) && !isNaN(timeB)) {
+        return timeA - timeB;
+      }
+    } catch (e) {}
+
+    return 0;
+  });
+};
+
 const Timeline: React.FC<TimelineProps> = ({ nodes }) => {
-  const sortedNodes = [...nodes].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
+  const sortedNodes = sortNodes(nodes);
+
+  const handlePhotoClick = (photo: string, allPhotos: string[]) => {
+    const realPhotos = allPhotos.filter(p => p.startsWith('http') || p.startsWith('file://') || p.startsWith('tmp:'));
+    if (realPhotos.length > 0) {
+      Taro.previewImage({
+        current: photo,
+        urls: realPhotos
+      });
+    }
+  };
 
   return (
     <View className={styles.container}>
       {sortedNodes.map((node, index) => (
         <View key={node.id} className={styles.item}>
           <View className={styles.left}>
-            <View className={classnames(styles.dot, index === 0 && styles.dotActive)} />
+            <View className={classnames(styles.dot, index === sortedNodes.length - 1 && styles.dotActive)} />
             {index < sortedNodes.length - 1 && <View className={styles.line} />}
           </View>
           <View className={styles.right}>
@@ -41,7 +73,7 @@ const Timeline: React.FC<TimelineProps> = ({ nodes }) => {
             <Text className={styles.time}>{formatSimpleDate(node.time)}</Text>
             <View className={styles.meta}>
               <Text className={styles.operator}>
-                {node.operatorRole === 'driver' ? '司机' : '仓管员'}：{node.operator}
+                {node.operatorRole === 'driver' ? '司机' : node.operatorRole === 'dispatcher' ? '调度员' : '仓管员'}：{node.operator}
               </Text>
               {node.receiver && (
                 <Text className={styles.receiver}>签收人：{node.receiver}</Text>
@@ -54,11 +86,23 @@ const Timeline: React.FC<TimelineProps> = ({ nodes }) => {
             )}
             {node.photos && node.photos.length > 0 && (
               <View className={styles.photos}>
-                {node.photos.map((photo, pIdx) => (
-                  <View key={pIdx} className={styles.photoWrap}>
-                    <Text className={styles.photoIcon}>📷</Text>
-                  </View>
-                ))}
+                {node.photos.map((photo, pIdx) => {
+                  const isRealPhoto = photo.startsWith('http') || photo.startsWith('file://') || photo.startsWith('tmp:');
+                  return (
+                    <View key={pIdx} className={styles.photoWrap}>
+                      {isRealPhoto ? (
+                        <Image
+                          className={styles.photoImg}
+                          src={photo}
+                          mode="aspectFill"
+                          onClick={() => handlePhotoClick(photo, node.photos!)}
+                        />
+                      ) : (
+                        <Text className={styles.photoIcon}>📷</Text>
+                      )}
+                    </View>
+                  );
+                })}
               </View>
             )}
           </View>
