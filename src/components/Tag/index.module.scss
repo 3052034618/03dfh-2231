@@ -1,0 +1,67 @@
+@use '@/styles/variables.scss' as *;
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $radius-sm;
+  white-space: nowrap;
+}
+
+.text {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+}
+
+.sm {
+  padding: 4rpx 12rpx;
+  .text {
+    font-size: 20rpx;
+  }
+}
+
+.md {
+  padding: 6rpx 16rpx;
+}
+
+.primary {
+  background-color: $color-bg-primary;
+  .text {
+    color: $color-primary;
+  }
+}
+
+.success {
+  background-color: $color-bg-success;
+  .text {
+    color: $color-success;
+  }
+}
+
+.warning {
+  background-color: $color-bg-warning;
+  .text {
+    color: $color-warning;
+  }
+}
+
+.error {
+  background-color: $color-bg-error;
+  .text {
+    color: $color-error;
+  }
+}
+
+.info {
+  background-color: $color-bg-primary;
+  .text {
+    color: $color-info;
+  }
+}
+
+.gray {
+  background-color: rgba(134, 144, 156, 0.1);
+  .text {
+    color: $color-text-tertiary;
+  }
+}

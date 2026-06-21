@@ -1,0 +1,54 @@
+@use '@/styles/variables.scss' as *;
+
+.normal, .warning, .error, .info {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.title {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-sm;
+}
+
+.value {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  line-height: 1.2;
+  margin-bottom: 4rpx;
+}
+
+.subText {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.normal {
+  .value {
+    color: $color-success;
+  }
+}
+
+.warning {
+  .value {
+    color: $color-warning;
+  }
+}
+
+.error {
+  .value {
+    color: $color-error;
+  }
+}
+
+.info {
+  .value {
+    color: $color-primary;
+  }
+}

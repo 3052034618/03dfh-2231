@@ -1,0 +1,86 @@
+@use '@/styles/variables.scss' as *;
+
+.pageContainer {
+  min-height: 100vh;
+  padding-bottom: 120rpx;
+  background: linear-gradient(180deg, rgba(30, 136, 229, 0.08) 0%, $color-bg-page 30%);
+}
+
+.header {
+  padding: $spacing-lg $page-padding $spacing-xl;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  border-radius: 0 0 $radius-xl $radius-xl;
+  margin-bottom: -$spacing-xl;
+  position: relative;
+  z-index: 1;
+}
+
+.greeting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-lg;
+}
+
+.greetingText {
+  color: $color-text-white;
+}
+
+.hello {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-medium;
+  display: block;
+  margin-bottom: 4rpx;
+  opacity: 0.9;
+}
+
+.userName {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  display: block;
+}
+
+.roleTag {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 8rpx 20rpx;
+  border-radius: $radius-round;
+  color: $color-text-white;
+  font-size: $font-size-sm;
+}
+
+.statsRow {
+  display: flex;
+  gap: $spacing-md;
+}
+
+.section {
+  padding: 0 $page-padding;
+  margin-top: $spacing-lg;
+}
+
+.sectionTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.seeAll {
+  font-size: $font-size-sm;
+  color: $color-primary;
+  font-weight: $font-weight-normal;
+}
+
+.actionsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-md;
+}
+
+.recordsList {
+  display: flex;
+  flex-direction: column;
+}

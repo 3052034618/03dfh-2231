@@ -1,0 +1,201 @@
+@use '@/styles/variables.scss' as *;
+
+.pageContainer {
+  min-height: 100vh;
+  padding-bottom: 120rpx;
+}
+
+.modeTabs {
+  display: flex;
+  background-color: $color-bg-card;
+  padding: $spacing-md $page-padding;
+  gap: $spacing-md;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.modeTab {
+  flex: 1;
+  text-align: center;
+  padding: $spacing-md 0;
+  border-radius: $radius-md;
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-secondary;
+  background-color: $color-bg-page;
+  transition: all $transition-base;
+
+  &.active {
+    background: linear-gradient(135deg, $color-primary, $color-primary-light);
+    color: $color-text-white;
+    box-shadow: 0 4rpx 12rpx rgba(30, 136, 229, 0.3);
+  }
+}
+
+.scanArea {
+  margin: $spacing-lg $page-padding;
+  background-color: $color-bg-card;
+  border-radius: $radius-xl;
+  padding: $spacing-xl * 2 $spacing-lg;
+  box-shadow: $shadow-card;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.scanIconWrap {
+  width: 280rpx;
+  height: 280rpx;
+  border-radius: $radius-xl;
+  background: linear-gradient(135deg, rgba(30, 136, 229, 0.1), rgba(66, 165, 245, 0.15));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: $spacing-lg;
+  position: relative;
+}
+
+.scanIcon {
+  font-size: 140rpx;
+}
+
+.scanLine {
+  position: absolute;
+  left: 32rpx;
+  right: 32rpx;
+  height: 4rpx;
+  background: linear-gradient(90deg, transparent, $color-primary, transparent);
+  animation: scanAnim 2s ease-in-out infinite;
+}
+
+@keyframes scanAnim {
+  0% { top: 32rpx; }
+  50% { top: calc(100% - 32rpx); }
+  100% { top: 32rpx; }
+}
+
+.scanTip {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-sm;
+}
+
+.scanDesc {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.actionButtons {
+  display: flex;
+  gap: $spacing-md;
+  margin: 0 $page-padding;
+}
+
+.primaryBtn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-lg;
+  background: linear-gradient(135deg, $color-primary, $color-primary-light);
+  border-radius: $radius-button;
+  color: $color-text-white;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  box-shadow: 0 6rpx 20rpx rgba(30, 136, 229, 0.35);
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.secondaryBtn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-lg;
+  background-color: $color-bg-card;
+  border-radius: $radius-button;
+  color: $color-primary;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  border: 2rpx solid $color-primary;
+
+  &:active {
+    opacity: 0.9;
+    background-color: $color-bg-primary;
+  }
+}
+
+.recentScans {
+  margin: $spacing-lg $page-padding;
+}
+
+.sectionTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+}
+
+.scanHistory {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  box-shadow: $shadow-card;
+}
+
+.historyItem {
+  padding: $spacing-md $spacing-lg;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1rpx solid $color-divider;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:active {
+    background-color: $color-bg-hover;
+  }
+}
+
+.historyLeft {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+}
+
+.historyIcon {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: $radius-md;
+  background-color: $color-bg-primary;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+}
+
+.historyInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.historyCode {
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+}
+
+.historyTime {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.historyArrow {
+  color: $color-text-tertiary;
+  font-size: $font-size-lg;
+}

@@ -1,0 +1,294 @@
+@use '@/styles/variables.scss' as *;
+
+.pageContainer {
+  min-height: 100vh;
+  padding-bottom: 180rpx;
+}
+
+.warnBanner {
+  margin: $spacing-md $page-padding;
+  background: linear-gradient(135deg, rgba(245, 63, 63, 0.1), rgba(255, 107, 107, 0.1));
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  border: 2rpx solid rgba(245, 63, 63, 0.2);
+}
+
+.warnIcon {
+  font-size: 56rpx;
+  flex-shrink: 0;
+}
+
+.warnContent {
+  flex: 1;
+}
+
+.warnTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-error;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.warnDesc {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: 1.5;
+}
+
+.formSection {
+  margin: 0 $page-padding $spacing-lg;
+}
+
+.sectionTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+}
+
+.sectionIcon {
+  font-size: 28rpx;
+}
+
+.formCard {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  box-shadow: $shadow-card;
+  padding: $spacing-md;
+}
+
+.boxSelector {
+  display: flex;
+  align-items: center;
+  padding: $spacing-md 0;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.selectorLabel {
+  width: 140rpx;
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+  flex-shrink: 0;
+}
+
+.selectorValue {
+  flex: 1;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+  @include text-ellipsis;
+}
+
+.selectorArrow {
+  color: $color-text-tertiary;
+  font-size: $font-size-lg;
+}
+
+.typeList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.typeItem {
+  display: flex;
+  align-items: center;
+  padding: $spacing-lg $spacing-md;
+  border-radius: $radius-md;
+  border: 2rpx solid $color-border;
+  transition: all $transition-base;
+
+  &.active {
+    border-color: $color-error;
+    background-color: rgba(245, 63, 63, 0.05);
+  }
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.typeRadio {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  border: 3rpx solid $color-border;
+  margin-right: $spacing-md;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  .active & {
+    border-color: $color-error;
+  }
+}
+
+.typeRadioInner {
+  width: 20rpx;
+  height: 20rpx;
+  border-radius: 50%;
+  background-color: $color-error;
+  opacity: 0;
+
+  .active & {
+    opacity: 1;
+  }
+}
+
+.typeContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.typeName {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+}
+
+.typeDesc {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: 4rpx;
+}
+
+.photoUploadArea {
+  padding: $spacing-md 0;
+}
+
+.photoGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-sm;
+}
+
+.photoItem {
+  aspect-ratio: 1;
+  border-radius: $radius-md;
+  background-color: $color-bg-page;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  border: 2rpx dashed $color-border;
+  transition: all $transition-base;
+
+  &.hasPhoto {
+    border-style: solid;
+    border-color: $color-error;
+    background-color: rgba(245, 63, 63, 0.05);
+  }
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.photoIcon {
+  font-size: 48rpx;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.photoText {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.photoDel {
+  position: absolute;
+  top: -12rpx;
+  right: -12rpx;
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  background-color: $color-error;
+  color: $color-text-white;
+  font-size: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.photoItemWrap {
+  position: relative;
+}
+
+.remarkArea {
+  width: 100%;
+  padding: $spacing-md;
+  background-color: $color-bg-page;
+  border-radius: $radius-md;
+  border: none;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  box-sizing: border-box;
+  min-height: 200rpx;
+}
+
+.charCount {
+  text-align: right;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: $spacing-xs;
+}
+
+.footerBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: $spacing-md $page-padding;
+  padding-bottom: calc(#{$spacing-md} + env(safe-area-inset-bottom));
+  background-color: $color-bg-card;
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.06);
+  display: flex;
+  gap: $spacing-md;
+}
+
+.cancelBtn {
+  @include button-reset;
+  width: 200rpx;
+  height: $button-height-lg;
+  background-color: $color-bg-page;
+  border-radius: $radius-button;
+  color: $color-text-secondary;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-medium;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.submitBtn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-lg;
+  background: linear-gradient(135deg, $color-error, #FF6B6B);
+  border-radius: $radius-button;
+  color: $color-text-white;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  box-shadow: 0 6rpx 20rpx rgba(245, 63, 63, 0.35);
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+
+  &.disabled {
+    background: $color-text-disabled;
+    box-shadow: none;
+  }
+}

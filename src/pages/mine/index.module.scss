@@ -1,0 +1,186 @@
+@use '@/styles/variables.scss' as *;
+
+.pageContainer {
+  min-height: 100vh;
+  padding-bottom: 120rpx;
+}
+
+.header {
+  padding: $spacing-xl $page-padding $spacing-xl * 2;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  border-radius: 0 0 $radius-xl $radius-xl;
+}
+
+.userCard {
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+}
+
+.avatar {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 64rpx;
+  border: 4rpx solid rgba(255, 255, 255, 0.4);
+}
+
+.userInfo {
+  flex: 1;
+  color: $color-text-white;
+}
+
+.userName {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.userRole {
+  display: inline-block;
+  padding: 6rpx 20rpx;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: $radius-round;
+  font-size: $font-size-sm;
+}
+
+.statsRow {
+  display: flex;
+  margin-top: $spacing-xl;
+  gap: $spacing-lg;
+}
+
+.statItem {
+  flex: 1;
+  text-align: center;
+  color: $color-text-white;
+}
+
+.statValue {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.statLabel {
+  font-size: $font-size-sm;
+  opacity: 0.85;
+}
+
+.section {
+  margin: $spacing-lg $page-padding 0;
+}
+
+.sectionTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+}
+
+.menuCard {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  box-shadow: $shadow-card;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  padding: $spacing-lg;
+  border-bottom: 1rpx solid $color-divider;
+  transition: background-color $transition-base;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:active {
+    background-color: $color-bg-hover;
+  }
+}
+
+.menuIcon {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: $radius-md;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: $spacing-md;
+  font-size: 32rpx;
+}
+
+.menuContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.menuTitle {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+}
+
+.menuDesc {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: 4rpx;
+}
+
+.menuArrow {
+  color: $color-text-tertiary;
+  font-size: $font-size-lg;
+}
+
+.iconBlue {
+  background-color: rgba(30, 136, 229, 0.1);
+}
+
+.iconGreen {
+  background-color: rgba(0, 180, 42, 0.1);
+}
+
+.iconOrange {
+  background-color: rgba(255, 125, 0, 0.1);
+}
+
+.iconRed {
+  background-color: rgba(245, 63, 63, 0.1);
+}
+
+.iconGray {
+  background-color: rgba(134, 144, 156, 0.1);
+}
+
+.roleSwitch {
+  display: flex;
+  gap: $spacing-sm;
+  margin-top: $spacing-md;
+}
+
+.roleBtn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-md;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  background-color: rgba(255, 255, 255, 0.15);
+  color: $color-text-white;
+  border: 2rpx solid rgba(255, 255, 255, 0.3);
+
+  &.active {
+    background-color: $color-text-white;
+    color: $color-primary;
+    font-weight: $font-weight-semibold;
+    border-color: $color-text-white;
+  }
+}
